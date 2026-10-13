@@ -1,6 +1,24 @@
 # Whale vs Diversity Sales Analysis
 
-SQL star schema + Power BI dashboard analyzing Whale orders vs diversified healthy pipe revenue by territory — built on AdventureWorks2025.
+SQL star schema + Power BI dashboard measuring how much reseller revenue depends on a small number of very large ("whale") orders, by territory — built on AdventureWorks2025.
+
+## 🎯 Business Question
+
+How dependent is reseller revenue on a handful of very large orders, and which territories carry the most concentration risk? Losing one or two big accounts in a concentrated territory hits revenue much harder than losing several small ones.
+
+## 🔍 Key Findings
+
+- **500 orders produce almost half the revenue.** Orders over $50K are only 13% of the 3,806 reseller orders but bring in 45.5% of revenue ($36.6M of $80.5M).
+- **Four territories get more than half their revenue from whale orders:** France (57%), Northwest (52%), United Kingdom (51%) and Southwest (51%).
+- **Southwest is both the largest and one of the most concentrated territories:** $18.5M in revenue, with 51% from 127 whale orders.
+- **Southeast (32%) and Australia (22%) have the most diversified revenue.**
+- **Revenue spikes at quarter-end.** March, June and September are the strongest months, and November is the weakest ($3.7M).
+
+## 💡 Recommendations
+
+- Monitor and protect the top whale accounts in France, Northwest, the UK and Southwest, where losing a few customers would hurt most.
+- Grow mid-size orders in those territories to reduce dependence on a few large buyers.
+- Plan inventory and staffing around quarter-end ordering peaks.
 
 ## Dashboard
 ![Dashboard](Whale%20Sales%20Dashboard.png)
@@ -31,7 +49,26 @@ A star schema data mart is built via a single SQL Server stored procedure (`Proc
 | Whale Concentration | 45.5 % |
 | Revenue Diversity | 54.5 % |
 | Average Order Value (AOV) | 21.1 K |
-| Order Count | 215 K |
+| Orders | 3,806 |
+| Units Sold (card labelled "Order Count" on dashboard) | 215 K |
+
+### Metric definitions
+
+| Metric | Definition |
+|---|---|
+| Scope | Reseller orders only: orders with an assigned salesperson (online sales are excluded) |
+| Whale order | An order whose total value is over $50,000 |
+| Whale Concentration | Revenue from whale orders ÷ total revenue |
+| Revenue Diversity | Revenue from all other orders ("Healthy Pipe") ÷ total revenue |
+| AOV | Total revenue ÷ distinct orders |
+
+### Data validation
+
+All KPIs were reconciled against the AdventureWorks source tables (`Sales.SalesOrderHeader`, `Sales.SalesOrderDetail`): total revenue, whale revenue, AOV and order totals match the source exactly.
+
+### ⚠️ Known issue
+
+The dashboard card labelled "Order Count" (215K) actually sums `OrderQty`, so it shows units sold. The true order count is 3,806, which is consistent with $80.5M revenue and a $21.1K AOV. The card will be relabelled.
 
 ## 🚀 Setup
 
