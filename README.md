@@ -4,7 +4,7 @@ SQL star schema + Power BI dashboard measuring how much reseller revenue depends
 
 ## 🎯 Business Question
 
-How dependent is reseller revenue on a handful of very large orders, and which territories carry the most concentration risk? Losing one or two big accounts in a concentrated territory hits revenue much harder than losing several small ones.
+How dependent is reseller revenue on a handful of very large orders, and which territories carry the most concentration risk? When a few large orders make up most of a territory's revenue, losing them hurts much more than losing several small ones.
 
 ## 🔍 Key Findings
 
@@ -12,11 +12,11 @@ How dependent is reseller revenue on a handful of very large orders, and which t
 - **Four territories get more than half their revenue from whale orders:** France (57%), Northwest (52%), United Kingdom (51%) and Southwest (51%).
 - **Southwest is both the largest and one of the most concentrated territories:** $18.5M in revenue, with 51% from 127 whale orders.
 - **Southeast (32%) and Australia (22%) have the most diversified revenue.**
-- **Revenue spikes at quarter-end.** March, June and September are the strongest months, and November is the weakest ($3.7M).
+- **Revenue spikes at quarter-end.** March, June and September are the strongest months, and November is the weakest ($3.7M). These monthly totals combine all years in the dataset, so a month that appears in more years can look stronger.
 
 ## 💡 Recommendations
 
-- Monitor and protect the top whale accounts in France, Northwest, the UK and Southwest, where losing a few customers would hurt most.
+- In France, Northwest, the UK and Southwest, identify which resellers place the whale orders and track them closely. These territories lose the most if large orders stop.
 - Grow mid-size orders in those territories to reduce dependence on a few large buyers.
 - Plan inventory and staffing around quarter-end ordering peaks.
 
@@ -36,10 +36,11 @@ A star schema data mart is built via a single SQL Server stored procedure (`Proc
 | `DimProduct` | Table | Product hierarchy (category → subcategory) |
 | `DimSalesTerritory` | Table | Territory, region group, and country |
 | `DimSalesPerson` | Table | Salesperson names |
-| `FactSales` | Table | Order-line grain — qty, unit price, line total |
+| `FactSales` | Table | Order-line grain — qty, unit price, line total, reseller (`CustomerID`) |
 | `v_FactSales_WhaleAnalysis` | View | Fact + whale classification + KPIs (Power BI source) |
 | `v_DimProduct_Diversity` | View | Product revenue split by order category (Power BI source) |
 | `v_DimTerritory_GapAnalysis` | View | Territory lookup for slicer filtering (Power BI source) |
+| `v_ResellerConcentration` | View | One row per reseller: revenue, whale revenue, rank and cumulative revenue share |
 
 ## 📈 KPI Summary
 
@@ -57,7 +58,7 @@ A star schema data mart is built via a single SQL Server stored procedure (`Proc
 | Metric | Definition |
 |---|---|
 | Scope | Reseller orders only: orders with an assigned salesperson (online sales are excluded) |
-| Whale order | An order whose total value is over $50,000 |
+| Whale order | An order whose total value is over $50,000. This fixed cutoff captures the largest ~13% of reseller orders (500 of 3,806) |
 | Whale Concentration | Revenue from whale orders ÷ total revenue |
 | Revenue Diversity | Revenue from all other orders ("Healthy Pipe") ÷ total revenue |
 | AOV | Total revenue ÷ distinct orders |
@@ -88,15 +89,4 @@ GO
 The procedure drops and recreates all objects — safe to re-run at any time.
 
 ### 2 — Connect Power BI
-- **Get Data → SQL Server** → point to your AdventureWorks2025 database
-- Import the three reporting views:
-  - `v_FactSales_WhaleAnalysis`
-  - `v_DimProduct_Diversity`
-  - `v_DimTerritory_GapAnalysis`
-- In the **Model view**, confirm relationships on `TerritoryID` and `ProductID`
-- Add DAX measures for AOV, Whale Concentration, Revenue Diversity %, etc.
-
-## 🛠️ Tech Stack
-- **SQL Server** — stored procedure, star schema, views
-- **T-SQL** — data transformation and mart build
-- **Power BI Desktop** — data model, DAX measures, report visuals
+- **Get Data → SQL
