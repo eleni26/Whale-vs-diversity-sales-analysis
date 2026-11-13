@@ -23,11 +23,10 @@ How dependent is reseller revenue on a handful of very large orders, and which t
 ## Dashboard
 🔗 **[View the interactive dashboard](https://app.powerbi.com/view?r=eyJrIjoiNTg2OTcyNWYtMDMxNS00NGI3LTgwMmUtZWY1ZmY3ZTI4ZjRmIiwidCI6ImY1MmYyMTgzLTlmNjctNGFkMi1iNjU2LTZmNzU0ZmUxOTZjYiIsImMiOjZ9)**
 
-![Dashboard](Whale%20Sales%20Dashboard_1.png)
+![Dashboard](Whale%20Sales%20Dashboard.png)
 
 ## Star Schema
-![Star Schema](Whale%20Sale%20Star%20schema_1.png)
-
+![Star Schema](Whale%20Sale%20Star%20schema.png)
 ## 📐 Architecture
 
 A star schema data mart is built via a single SQL Server stored procedure (`Procedure Scripts.sql`):
