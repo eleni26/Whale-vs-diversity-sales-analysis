@@ -21,6 +21,8 @@ How dependent is reseller revenue on a handful of very large orders, and which t
 - Plan inventory and staffing around quarter-end ordering peaks.
 
 ## Dashboard
+🔗 **[View the interactive dashboard](https://app.powerbi.com/view?r=eyJrIjoiNTg2OTcyNWYtMDMxNS00NGI3LTgwMmUtZWY1ZmY3ZTI4ZjRmIiwidCI6ImY1MmYyMTgzLTlmNjctNGFkMi1iNjU2LTZmNzU0ZmUxOTZjYiIsImMiOjZ9)**
+
 ![Dashboard](Whale%20Sales%20Dashboard.png)
 
 ## Star Schema
@@ -36,11 +38,10 @@ A star schema data mart is built via a single SQL Server stored procedure (`Proc
 | `DimProduct` | Table | Product hierarchy (category → subcategory) |
 | `DimSalesTerritory` | Table | Territory, region group, and country |
 | `DimSalesPerson` | Table | Salesperson names |
-| `FactSales` | Table | Order-line grain — qty, unit price, line total, reseller (`CustomerID`) |
+| `FactSales` | Table | Order-line grain — qty, unit price, line total |
 | `v_FactSales_WhaleAnalysis` | View | Fact + whale classification + KPIs (Power BI source) |
 | `v_DimProduct_Diversity` | View | Product revenue split by order category (Power BI source) |
 | `v_DimTerritory_GapAnalysis` | View | Territory lookup for slicer filtering (Power BI source) |
-| `v_ResellerConcentration` | View | One row per reseller: revenue, whale revenue, rank and cumulative revenue share |
 
 ## 📈 KPI Summary
 
@@ -51,7 +52,6 @@ A star schema data mart is built via a single SQL Server stored procedure (`Proc
 | Revenue Diversity | 54.5 % |
 | Average Order Value (AOV) | 21.1 K |
 | Orders | 3,806 |
-| Units Sold (card labelled "Order Count" on dashboard) | 215 K |
 
 ### Metric definitions
 
@@ -66,10 +66,6 @@ A star schema data mart is built via a single SQL Server stored procedure (`Proc
 ### Data validation
 
 All KPIs were reconciled against the AdventureWorks source tables (`Sales.SalesOrderHeader`, `Sales.SalesOrderDetail`): total revenue, whale revenue, AOV and order totals match the source exactly.
-
-### ⚠️ Known issue
-
-The dashboard card labelled "Order Count" (215K) actually sums `OrderQty`, so it shows units sold. The true order count is 3,806, which is consistent with $80.5M revenue and a $21.1K AOV. The card will be relabelled.
 
 ## 🚀 Setup
 
@@ -89,4 +85,15 @@ GO
 The procedure drops and recreates all objects — safe to re-run at any time.
 
 ### 2 — Connect Power BI
-- **Get Data → SQL
+- **Get Data → SQL Server** → point to your AdventureWorks2025 database
+- Import the three reporting views:
+  - `v_FactSales_WhaleAnalysis`
+  - `v_DimProduct_Diversity`
+  - `v_DimTerritory_GapAnalysis`
+- In the **Model view**, confirm relationships on `TerritoryID` and `ProductID`
+- Add DAX measures for AOV, Whale Concentration, Revenue Diversity %, etc.
+
+## 🛠️ Tech Stack
+- **SQL Server** — stored procedure, star schema, views
+- **T-SQL** — data transformation and mart build
+- **Power BI Desktop** — data model, DAX measures, report visuals
